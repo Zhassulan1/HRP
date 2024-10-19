@@ -35,7 +35,6 @@ class Vacancy(models.Model):
     date_closed = models.DateTimeField(null=True, default=None)
     is_active = models.BooleanField(default=True)
 
-
 class Employee(models.Model):
     tg_id = models.IntegerField()
     tg_username = models.CharField(max_length=50)
@@ -57,7 +56,9 @@ class VacancyResponse(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    is_accepted = models.BooleanField(default=False)
+    # is_accepted = models.BooleanField(default=False)
+    status = models.CharField(max_length=30)
+
 
 
 class Document(models.Model):
