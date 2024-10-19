@@ -14,9 +14,9 @@ from api.serializers import VacancySerializer, EmployerSerializer, \
 class EmployerList(APIView):
     def get(self, request):
         employers = Employer.objects.all()
-        employers_serializer = EmployerSerializer(employers, many=True)
-        print("Eployers:", employers_serializer.data)
-        return Response(employers_serializer.data)
+        serializer = EmployerSerializer(employers, many=True)
+        print("Eployers:", serializer.data)
+        return Response(serializer.data)
     
     def post(self, request):
         serializer = EmployerSerializer(data=request.data)
@@ -37,9 +37,9 @@ class EmployerDetail(APIView):
 
     def get(self, request, id):
         employer = self.get_object(id=id)
-        employer_serializer = EmployerSerializer(employer)
+        serializer = EmployerSerializer(employer)
         print("Employer:", employer)
-        return JsonResponse(employer_serializer.data, safe=False)
+        return JsonResponse(serializer.data, safe=False)
 
     def put(self, request, id):
         employer = self.get_object(id=id)
@@ -67,9 +67,9 @@ class EmployerDetail(APIView):
 class EmployeeList(APIView):
     def get(self, request):
         employees = Employee.objects.all()
-        employees_serializer = EmployeeSerializer(employees, many=True)
-        print("Eployers:", employees_serializer.data)
-        return Response(employees_serializer.data)
+        serializer = EmployeeSerializer(employees, many=True)
+        print("Eployers:", serializer.data)
+        return Response(serializer.data)
     
     def post(self, request):
         serializer = EmployeeSerializer(data=request.data)
@@ -112,6 +112,59 @@ class EmployeeDetail(APIView):
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+
+class VacancyList(APIView):
+    def get(self, request):
+        vacancies = Vacancy.objects.all()
+        serializer = VacancySerializer(vacancies, many=True)
+        print("Eployers:", serializer.data)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = VacancySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class VacancyDetail(APIView):
+    def get_object(self, id):
+        try:
+            return Vacancy.objects.get(id=id)
+        except Vacancy.DoesNotExist:
+            return None
+
+    def get(self, request, id):
+        vacancy = self.get_object(id=id)
+        serializer = VacancySerializer(vacancy)
+        print("vacancy:", vacancy)
+        return JsonResponse(serializer.data, safe=False)
+
+    def put(self, request, id):
+        vacancy = self.get_object(id=id)
+        if vacancy is None:
+            return Response({'error: vacancies are not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = VacancySerializer(vacancy, data=request.data)    
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        vacancy = self.get_object(id=id)
+        if vacancy is None:
+            return Response({'error: vacancy is not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        vacancy.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 
 

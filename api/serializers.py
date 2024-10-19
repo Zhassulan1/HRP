@@ -14,7 +14,20 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['tg_id', 'tg_username', 'name', 'surname', 'email', 'phone', 'skills', 'cv_url', 'expected_salary', 'city']
+        read_only_fields = ['id']
+        fields = [
+            'id', 
+            'tg_id', 
+            'tg_username', 
+            'name', 
+            'surname', 
+            'email', 
+            'phone', 
+            'skills', 
+            'cv_url', 
+            'expected_salary', 
+            'city'
+        ]
 
     def create(self, validated_data):
         skills_data = validated_data.pop('skills')
@@ -48,9 +61,57 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return instance
 
 class VacancySerializer(serializers.ModelSerializer):
+    required_skills = SkillSerializer(many=True)
+
     class Meta:
         model = Vacancy
-        fields = '__all__'
+        read_only_fields = ['id']
+        fields = [
+            'id',
+            'title', 
+            'description', 
+            'required_skills', 
+            'employer', 
+            'salary_min', 
+            'salary_max', 
+            'experience', 
+            'city', 
+            'address', 
+            'date_created', 
+            'date_closed', 
+            'is_active'
+        ]
+
+    def create(self, validated_data):
+        skills_data = validated_data.pop('required_skills')
+        vacancy = Vacancy.objects.create(**validated_data)
+        for skill_data in skills_data:
+            skill, created = Skill.objects.get_or_create(**skill_data)
+            vacancy.required_skills.add(skill)
+        return vacancy
+
+    def update(self, instance, validated_data):
+        skills_data = validated_data.pop('required_skills')
+
+        # Update the fields of the Vacancy instance
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.salary_min = validated_data.get('salary_min', instance.salary_min)
+        instance.salary_max = validated_data.get('salary_max', instance.salary_max)
+        instance.experience = validated_data.get('experience', instance.experience)
+        instance.city = validated_data.get('city', instance.city)
+        instance.address = validated_data.get('address', instance.address)
+        instance.date_closed = validated_data.get('date_closed', instance.date_closed)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        instance.save()
+
+        # Update the related required_skills
+        instance.required_skills.clear()  # Clear existing skills
+        for skill_data in skills_data:
+            skill, created = Skill.objects.get_or_create(**skill_data)
+            instance.required_skills.add(skill)
+
+        return instance
 
 
 class EmployerSerializer(serializers.ModelSerializer):

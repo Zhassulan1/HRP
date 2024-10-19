@@ -9,5 +9,8 @@ urlpatterns = [
     path('employee', views.EmployeeList.as_view()),
     path('employee/<int:id>', views.EmployeeDetail.as_view()),
 
+    path('vacancy', views.VacancyList.as_view()),
+    path('vacancy/<int:id>', views.VacancyDetail.as_view()),
+
     path('upload_cv', views.upload_cv),
 ]

@@ -18,12 +18,11 @@ class Employer(models.Model):
 
 
 class Vacancy(models.Model):
-    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     required_skills = models.ManyToManyField(Skill)
 
-    employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
+    employer = models.ForeignKey(Employer, on_delete=models.CASCADE, null=True, default=None)
 
     salary_min = models.IntegerField()
     salary_max = models.IntegerField()
@@ -33,7 +32,7 @@ class Vacancy(models.Model):
     address = models.CharField(max_length=100)
 
     date_created = models.DateTimeField(auto_now_add=True)
-    date_closed = models.DateTimeField(null=True)
+    date_closed = models.DateTimeField(null=True, default=None)
     is_active = models.BooleanField(default=True)
 
 
