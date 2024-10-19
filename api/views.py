@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from api.models import Vacancy, Employer, Employee, VacancyResponses
+from api.s3 import generate_key, upload_bytes
 from api.serializers import VacancySerializer, EmployerSerializer, \
     EmployeeSerializer, VacancyResponsesSerializer
 
@@ -22,6 +24,8 @@ class EmployerList(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class EmployerDetail(APIView):
@@ -107,3 +111,32 @@ class EmployeeDetail(APIView):
         
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+@csrf_exempt
+def upload_cv(request):
+    cv = request.FILES['cv']
+
+    cv_key = generate_key('Employeer', "cv", cv.name.replace(' ', '_'))
+    cv_url = upload_bytes(cv, cv_key)
+
+    return JsonResponse({'cv_url': cv_url})
+
+
+
+
+
+# cv = request.FILES['cv']
+
+# cv_key = generate_key('', "original", cv.name)
+# cv_url = upload_bytes(cv, cv_key)
+
+# request_data = request.data
+# data = {
+#     **request_data,
+#     'cv_url': cv_url
+# }
+
+# serializer = EmployeeSerializer(data=data)
