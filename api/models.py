@@ -51,10 +51,10 @@ class Employee(models.Model):
     city = models.CharField(max_length=30)
 
 
-class VacancyResponses(models.Model):
-    id = models.IntegerField(primary_key=True)
+class VacancyResponse(models.Model):
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    is_accepted = models.BooleanField(default=False)

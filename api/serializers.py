@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Vacancy, Employer, Employee, VacancyResponses, Skill
+from api.models import Vacancy, Employer, Employee, VacancyResponse, Skill
 
 
 from rest_framework import serializers
@@ -121,7 +121,7 @@ class EmployerSerializer(serializers.ModelSerializer):
 
 
 
-class VacancyResponsesSerializer(serializers.ModelSerializer):
+class VacancyResponseSerializer(serializers.ModelSerializer):
         class Meta:
-            model = VacancyResponses
+            model = VacancyResponse
             fields = '__all__'

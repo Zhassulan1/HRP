@@ -5,10 +5,10 @@ from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from api.models import Vacancy, Employer, Employee, VacancyResponses
+from api.models import Vacancy, Employer, Employee, VacancyResponse
 from api.s3 import generate_key, upload_bytes
 from api.serializers import VacancySerializer, EmployerSerializer, \
-    EmployeeSerializer, VacancyResponsesSerializer
+    EmployeeSerializer, VacancyResponseSerializer
 
 
 class EmployerList(APIView):
@@ -165,6 +165,60 @@ class VacancyDetail(APIView):
         vacancy.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+
+
+class VacancyResponseList(APIView):
+    def get(self, request):
+        vacancy_responses = VacancyResponse.objects.all()
+        serializer = VacancyResponseSerializer(vacancy_responses, many=True)
+        print("Eployers:", serializer.data)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = VacancyResponseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class VacancyResponseDetail(APIView):
+    def get_object(self, id):
+        try:
+            return VacancyResponse.objects.get(id=id)
+        except VacancyResponse.DoesNotExist:
+            return None
+
+    def get(self, request, id):
+        vacancy_responses = self.get_object(id=id)
+        serializer = VacancyResponseSerializer(vacancy_responses)
+        print("VacancyResponse:", vacancy_responses)
+        return JsonResponse(serializer.data, safe=False)
+
+    def put(self, request, id):
+        vacancy_responses = self.get_object(id=id)
+        if vacancy_responses is None:
+            return Response({'error: VacancyResponses are not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = VacancyResponseSerializer(vacancy_responses, data=request.data)    
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        vacancy_responses = self.get_object(id=id)
+        if vacancy_responses is None:
+            return Response({'error: VacancyResponse is not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        vacancy_responses.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 
