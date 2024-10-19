@@ -31,15 +31,15 @@ print("Secret key:", SECRET_KEY)
 
 
 ALLOWED_HOSTS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "https://**.vercel.app",
+    "http://localhost:3000/",
+    "http://localhost:8000/",
+    "https://**.vercel.app/",
 ]
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = (os.environ.get("DEBUG_MODE") == "True")
+DEBUG = (os.environ.get("DEBUG") == "True")
 
 if DEBUG == True:
     print("DEBUG MODE IS ON")
@@ -154,3 +154,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Other secret keys
 # Example
 # OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.environ.get("AWS_REGION")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
