@@ -10,6 +10,7 @@ from api.models import Vacancy, Employer, Employee, VacancyResponse, Document
 from api.s3 import generate_key, upload_bytes, upload_file
 from api.serializers import VacancySerializer, EmployerSerializer, \
     EmployeeSerializer, VacancyResponseSerializer, DocumentSerializer
+from io import BytesIO
 
 import os
 from dotenv import load_dotenv
@@ -238,12 +239,19 @@ def upload_cv(request):
 
 
 class UploadDocumentView(APIView):
-    def post(self, request, *args, **kwargs):
-        uf_file = request.FILES['uf']
+     def post(self, request):
+        if 'uf' not in request.FILES:
+            return Response({"error": "Файл не был передан"}, status=status.HTTP_400_BAD_REQUEST)
         
+        uf_file = request.FILES['uf']
+
+        uf_file_bytes = BytesIO(uf_file.read())
+        uf_file.seek(0)  
+
         login = os.getenv('LOGIN')
         apikey = os.getenv('API_KEY')
         type_delegate = 1
+        
         nametxt = generate_key('Employeer', "uf", uf_file.name.replace(' ', '_'))
         uf_url = upload_bytes(uf_file, nametxt)
 
@@ -252,9 +260,9 @@ class UploadDocumentView(APIView):
             owner_bin=request.data['owner_bin'],
             receiver_bin=request.data['receiver_bin'],
             receiver_mail=request.data.get('receiver_mail'),
-            uf_url=uf_url  
+            uf=uf_url  
         )
-
+        
         data = {
             'login': login,
             'apikey': apikey,
@@ -265,19 +273,14 @@ class UploadDocumentView(APIView):
             'receiver_mail': document.receiver_mail,
         }
 
-        files = {'uf': uf_file}
+        files = {'uf': ('filename', BytesIO(uf_file_bytes.getbuffer()))}
         response = requests.post('http://api.podpishi.kz/api.php', data=data, files=files)
 
         if response.status_code == 200:
-            return Response({"message": "Документ успешно загружен в API и сохранен в S3"}, status=status.HTTP_200_OK)
+            return Response({"message": "Документ успешно загружен в API"}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Ошибка при отправке документа на API"}, status=response.status_code)
-           
-
-
-
-
-
+        
 
 
 
