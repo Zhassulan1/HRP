@@ -1,6 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination
 
 import requests
 from django.http import JsonResponse
@@ -119,15 +123,29 @@ class EmployeeDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class VacancyPagination(PageNumberPagination):
+    page_size = 10  # Number of vacancies per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
-
-class VacancyList(APIView):
-    def get(self, request):
-        vacancies = Vacancy.objects.all()
-        serializer = VacancySerializer(vacancies, many=True)
-        print("Eployers:", serializer.data)
-        return Response(serializer.data)
+class VacancyList(ListAPIView):
+    queryset = Vacancy.objects.all()
+    serializer_class = VacancySerializer
+    pagination_class = VacancyPagination  # Use pagination
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     
+    # Define filters for vacancy fields, for example, 'employer', 'location', etc.
+    filterset_fields = ['salary_min', 'city', 'is_remote']
+    
+    # Define the fields allowed for sorting
+    ordering_fields = ['salary_min', 'date_created', 'title']
+    ordering = ['date_created']  # Default ordering
+
+    def get(self, request, *args, **kwargs):
+        print("Employers:", self.get_queryset())
+        return super().get(request, *args, **kwargs)
+    
+
     def post(self, request):
         serializer = VacancySerializer(data=request.data)
         if serializer.is_valid():

@@ -21,7 +21,7 @@ class Vacancy(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     required_skills = models.ManyToManyField(Skill)
-
+    is_remote = models.BooleanField(default=False)
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE, null=True, default=None)
 
     salary_min = models.IntegerField()
