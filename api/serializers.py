@@ -74,6 +74,7 @@ class VacancySerializer(serializers.ModelSerializer):
             'employer', 
             'salary_min', 
             'salary_max', 
+            'is_remote',
             'experience', 
             'city', 
             'address', 
@@ -100,6 +101,7 @@ class VacancySerializer(serializers.ModelSerializer):
         instance.salary_max = validated_data.get('salary_max', instance.salary_max)
         instance.experience = validated_data.get('experience', instance.experience)
         instance.city = validated_data.get('city', instance.city)
+        instance.city = validated_data.get('is_remote', instance.is_remote)
         instance.address = validated_data.get('address', instance.address)
         instance.date_closed = validated_data.get('date_closed', instance.date_closed)
         instance.is_active = validated_data.get('is_active', instance.is_active)
