@@ -44,7 +44,7 @@ DEBUG = (os.environ.get("DEBUG") == "True")
 if DEBUG == True:
     print("DEBUG MODE IS ON")
     print(SECRET_KEY)
-    ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
