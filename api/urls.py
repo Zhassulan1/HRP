@@ -16,4 +16,5 @@ urlpatterns = [
     path('vacancy_response/<int:id>', views.VacancyResponseDetail.as_view()),
 
     path('upload_cv', views.upload_cv),
+    path('upload_document', views.UploadDocumentView.as_view()),
 ]

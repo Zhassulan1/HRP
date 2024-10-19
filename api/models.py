@@ -58,3 +58,12 @@ class VacancyResponse(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_accepted = models.BooleanField(default=False)
+
+
+class Document(models.Model):
+    nametxt = models.CharField(max_length=250)
+    owner_bin = models.CharField(max_length=12)
+    receiver_bin = models.CharField(max_length=12)
+    receiver_mail = models.EmailField(max_length=50, blank=True, null=True)
+    uf=models.URLField(max_length=200, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)

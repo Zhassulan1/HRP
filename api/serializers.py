@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Vacancy, Employer, Employee, VacancyResponse, Skill
+from api.models import Vacancy, Employer, Employee, VacancyResponse, Skill, Document
 
 
 from rest_framework import serializers
@@ -125,3 +125,9 @@ class VacancyResponseSerializer(serializers.ModelSerializer):
         class Meta:
             model = VacancyResponse
             fields = '__all__'
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ['uf', 'owner_bin', 'receiver_bin', 'receiver_mail']

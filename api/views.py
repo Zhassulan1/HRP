@@ -2,13 +2,18 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from api.models import Vacancy, Employer, Employee, VacancyResponse
-from api.s3 import generate_key, upload_bytes
+from api.models import Vacancy, Employer, Employee, VacancyResponse, Document
+from api.s3 import generate_key, upload_bytes, upload_file
 from api.serializers import VacancySerializer, EmployerSerializer, \
-    EmployeeSerializer, VacancyResponseSerializer
+    EmployeeSerializer, VacancyResponseSerializer, DocumentSerializer
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class EmployerList(APIView):
@@ -230,6 +235,50 @@ def upload_cv(request):
     cv_url = upload_bytes(cv, cv_key)
 
     return JsonResponse({'cv_url': cv_url})
+
+
+class UploadDocumentView(APIView):
+    def post(self, request, *args, **kwargs):
+        uf_file = request.FILES['uf']
+        
+        login = os.getenv('LOGIN')
+        apikey = os.getenv('API_KEY')
+        type_delegate = 1
+        nametxt = generate_key('Employeer', "uf", uf_file.name.replace(' ', '_'))
+        uf_url = upload_bytes(uf_file, nametxt)
+
+        document = Document.objects.create(
+            nametxt=nametxt,
+            owner_bin=request.data['owner_bin'],
+            receiver_bin=request.data['receiver_bin'],
+            receiver_mail=request.data.get('receiver_mail'),
+            uf_url=uf_url  
+        )
+
+        data = {
+            'login': login,
+            'apikey': apikey,
+            'nametxt': nametxt,
+            'owner_bin': document.owner_bin,
+            'receiver_bin': document.receiver_bin,
+            'type_delegate': type_delegate,
+            'receiver_mail': document.receiver_mail,
+        }
+
+        files = {'uf': uf_file}
+        response = requests.post('http://api.podpishi.kz/api.php', data=data, files=files)
+
+        if response.status_code == 200:
+            return Response({"message": "Документ успешно загружен в API и сохранен в S3"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Ошибка при отправке документа на API"}, status=response.status_code)
+           
+
+
+
+
+
+
 
 
 
